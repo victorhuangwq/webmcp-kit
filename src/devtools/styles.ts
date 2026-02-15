@@ -101,48 +101,6 @@ export const panelStyles = `
     letter-spacing: 0.3px;
   }
 
-  .setup-tip {
-    background: rgba(249, 226, 175, 0.1);
-    border: 1px solid var(--panel-warning);
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 12px;
-    font-size: 11px;
-    line-height: 1.5;
-  }
-
-  .setup-tip strong {
-    color: var(--panel-warning);
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  .setup-tip ol {
-    margin: 0;
-    padding-left: 18px;
-    color: var(--panel-text-muted);
-  }
-
-  .setup-tip li {
-    margin-bottom: 4px;
-  }
-
-  .setup-tip a {
-    color: var(--panel-accent);
-    text-decoration: none;
-  }
-
-  .setup-tip a:hover {
-    text-decoration: underline;
-  }
-
-  .setup-tip code {
-    background: var(--panel-surface);
-    padding: 1px 4px;
-    border-radius: 3px;
-    font-size: 10px;
-  }
-
   .panel-controls {
     display: flex;
     gap: 4px;
@@ -168,6 +126,67 @@ export const panelStyles = `
     flex: 1;
     overflow-y: auto;
     padding: 12px;
+  }
+
+  .setup-banner {
+    background: var(--panel-surface);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 12px;
+  }
+
+  .setup-banner summary {
+    padding: 10px 12px;
+    cursor: pointer;
+    color: var(--panel-warning);
+    font-weight: 500;
+    user-select: none;
+  }
+
+  .setup-banner summary:hover {
+    background: rgba(249, 226, 175, 0.05);
+  }
+
+  .setup-banner[open] summary {
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .setup-content {
+    padding: 12px;
+  }
+
+  .setup-content ol {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--panel-text-muted);
+    line-height: 1.6;
+  }
+
+  .setup-content li {
+    margin-bottom: 6px;
+  }
+
+  .setup-content a {
+    color: var(--panel-accent);
+    text-decoration: none;
+  }
+
+  .setup-content a:hover {
+    text-decoration: underline;
+  }
+
+  .setup-content code {
+    background: var(--panel-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .setup-content p {
+    margin: 0;
+    color: var(--panel-text-muted);
   }
 
   .empty-state {
@@ -227,10 +246,23 @@ export const panelStyles = `
 
   .tool-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     padding-bottom: 8px;
     border-bottom: 1px solid var(--panel-border);
+  }
+
+  .tool-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tool-header .tool-name {
+    margin-bottom: 2px;
+  }
+
+  .tool-header .tool-description {
+    font-size: 11px;
   }
 
   .back-btn {

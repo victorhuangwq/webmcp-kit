@@ -123,18 +123,25 @@ export function createPanel(): HTMLElement {
     return '<span class="panel-mock">Mock</span>';
   }
 
-  function renderSetupTip(): string {
-    if (state.useNativeAPI || !isChrome()) return '';
+  function renderSetupBanner(): string {
+    if (state.useNativeAPI) {
+      return '';
+    }
+    const content = isChrome()
+      ? `<div class="setup-content">
+          <ol>
+            <li>Download <a href="https://www.google.com/chrome/canary/" target="_blank">Chrome Canary</a></li>
+            <li>Go to <code>chrome://flags</code></li>
+            <li>Set "Enables WebMCP for Testing" to Enabled</li>
+            <li>Restart browser</li>
+          </ol>
+        </div>`
+      : '<div class="setup-content"><p>Native WebMCP is not available in this browser.</p></div>';
     return `
-      <div class="setup-tip">
-        <strong>To enable native WebMCP:</strong>
-        <ol>
-          <li>Download <a href="https://www.google.com/chrome/canary/" target="_blank">Chrome Canary</a></li>
-          <li>Go to <code>chrome://flags</code></li>
-          <li>Set "Enables WebMCP for Testing" to Enabled</li>
-          <li>Restart browser</li>
-        </ol>
-      </div>
+      <details class="setup-banner">
+        <summary>Enable native WebMCP</summary>
+        ${content}
+      </details>
     `;
   }
 
@@ -156,7 +163,7 @@ export function createPanel(): HTMLElement {
       </div>
       ${!state.isMinimized ? `
         <div class="panel-body">
-          ${renderSetupTip()}
+          ${renderSetupBanner()}
           ${tools.length === 0 ? renderEmptyState() : ''}
           ${tools.length > 0 && !state.selectedTool ? renderToolList(tools) : ''}
           ${state.selectedTool ? renderToolTester(state.selectedTool) : ''}
@@ -199,7 +206,10 @@ export function createPanel(): HTMLElement {
       <div class="tool-tester">
         <div class="tool-header">
           <button class="back-btn" data-action="back" title="Back to list">←</button>
-          <div class="tool-name">${escapeHtml(tool.name)}</div>
+          <div class="tool-info">
+            <div class="tool-name">${escapeHtml(tool.name)}</div>
+            <div class="tool-description">${escapeHtml(tool.description)}</div>
+          </div>
         </div>
         <form class="input-form" data-action="execute">
           ${Object.entries(properties).map(([key, propSchema]) =>

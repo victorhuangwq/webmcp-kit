@@ -12,11 +12,28 @@ interface PanelState {
 }
 
 /**
+ * Normalize a tool from native API (parse inputSchema if it's a string)
+ */
+function normalizeTool(tool: WebMCPTool): WebMCPTool {
+  if (typeof tool.inputSchema === 'string') {
+    try {
+      return {
+        ...tool,
+        inputSchema: JSON.parse(tool.inputSchema),
+      };
+    } catch {
+      // Keep as-is if parse fails
+    }
+  }
+  return tool;
+}
+
+/**
  * Get tools from the appropriate source
  */
 function getTools(useNativeAPI: boolean): WebMCPTool[] {
   if (useNativeAPI && navigator.modelContextTesting) {
-    return navigator.modelContextTesting.listTools();
+    return navigator.modelContextTesting.listTools().map(normalizeTool);
   }
   return toolRegistry.getAll();
 }
@@ -26,7 +43,8 @@ function getTools(useNativeAPI: boolean): WebMCPTool[] {
  */
 function getTool(name: string, useNativeAPI: boolean): WebMCPTool | undefined {
   if (useNativeAPI && navigator.modelContextTesting) {
-    return navigator.modelContextTesting.listTools().find(t => t.name === name);
+    const tool = navigator.modelContextTesting.listTools().find(t => t.name === name);
+    return tool ? normalizeTool(tool) : undefined;
   }
   return toolRegistry.get(name);
 }

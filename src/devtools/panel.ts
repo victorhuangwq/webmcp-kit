@@ -262,7 +262,16 @@ export function createPanel(): HTMLElement {
   }
 
   function renderResult(result: { response: ToolResponse; time: number }): string {
-    const response = result.response;
+    // Parse response if it's a string (native API returns JSON string)
+    let response = result.response;
+    if (typeof response === 'string') {
+      try {
+        response = JSON.parse(response);
+      } catch {
+        // Keep as string if parse fails
+      }
+    }
+
     const isError = response?.isError;
 
     let content: string;
@@ -275,7 +284,7 @@ export function createPanel(): HTMLElement {
         .join('\n');
     } else {
       // Fallback: stringify the whole response
-      content = JSON.stringify(response, null, 2);
+      content = typeof response === 'string' ? response : JSON.stringify(response, null, 2);
     }
 
     return `

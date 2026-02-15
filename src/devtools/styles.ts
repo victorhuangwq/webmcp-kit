@@ -90,6 +90,59 @@ export const panelStyles = `
     letter-spacing: 0.3px;
   }
 
+  .panel-mock {
+    background: var(--panel-warning);
+    color: var(--panel-bg);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .setup-tip {
+    background: rgba(249, 226, 175, 0.1);
+    border: 1px solid var(--panel-warning);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .setup-tip strong {
+    color: var(--panel-warning);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .setup-tip ol {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--panel-text-muted);
+  }
+
+  .setup-tip li {
+    margin-bottom: 4px;
+  }
+
+  .setup-tip a {
+    color: var(--panel-accent);
+    text-decoration: none;
+  }
+
+  .setup-tip a:hover {
+    text-decoration: underline;
+  }
+
+  .setup-tip code {
+    background: var(--panel-surface);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 10px;
+  }
+
   .panel-controls {
     display: flex;
     gap: 4px;

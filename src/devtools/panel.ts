@@ -112,6 +112,32 @@ export function createPanel(): HTMLElement {
     console.debug('[webmcp-kit] Dev panel using mock tool registry');
   }
 
+  function isChrome(): boolean {
+    return typeof navigator !== 'undefined' && /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent);
+  }
+
+  function renderModeTag(): string {
+    if (state.useNativeAPI) {
+      return '<span class="panel-native">Native</span>';
+    }
+    return '<span class="panel-mock">Mock</span>';
+  }
+
+  function renderSetupTip(): string {
+    if (state.useNativeAPI || !isChrome()) return '';
+    return `
+      <div class="setup-tip">
+        <strong>To enable native WebMCP:</strong>
+        <ol>
+          <li>Download <a href="https://www.google.com/chrome/canary/" target="_blank">Chrome Canary</a></li>
+          <li>Go to <code>chrome://flags</code></li>
+          <li>Set "Enables WebMCP for Testing" to Enabled</li>
+          <li>Restart browser</li>
+        </ol>
+      </div>
+    `;
+  }
+
   function render(): void {
     const tools = getTools(state.useNativeAPI);
 
@@ -120,7 +146,7 @@ export function createPanel(): HTMLElement {
         <div class="panel-title">
           <span>WebMCP DevTools</span>
           <span class="panel-badge">${tools.length}</span>
-          ${state.useNativeAPI ? '<span class="panel-native">Native</span>' : ''}
+          ${renderModeTag()}
         </div>
         <div class="panel-controls">
           <button class="panel-btn" data-action="minimize" title="${state.isMinimized ? 'Expand' : 'Minimize'}">
@@ -130,6 +156,7 @@ export function createPanel(): HTMLElement {
       </div>
       ${!state.isMinimized ? `
         <div class="panel-body">
+          ${renderSetupTip()}
           ${tools.length === 0 ? renderEmptyState() : ''}
           ${tools.length > 0 && !state.selectedTool ? renderToolList(tools) : ''}
           ${state.selectedTool ? renderToolTester(state.selectedTool) : ''}

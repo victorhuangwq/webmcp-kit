@@ -157,25 +157,6 @@ export function defineTool<TSchema extends z.ZodTypeAny>(
     ...(annotations && { annotations }),
   });
 
-  /**
-   * Get the appropriate ModelContext (native or mock)
-   */
-  const getContext = () => {
-    if (isWebMCPSupported()) {
-      return navigator.modelContext!;
-    }
-
-    // Log helpful message in development
-    if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
-      console.debug(
-        `[webmcp-kit] Using mock modelContext for tool "${name}". ` +
-          'Native WebMCP not available.'
-      );
-    }
-
-    return getMockModelContext();
-  };
-
   return {
     name,
     description,
@@ -184,11 +165,29 @@ export function defineTool<TSchema extends z.ZodTypeAny>(
     annotations,
 
     register() {
-      getContext().registerTool(toWebMCPTool());
+      const webmcpTool = toWebMCPTool();
+
+      if (isWebMCPSupported()) {
+        // Use native API (dev panel will use modelContextTesting)
+        navigator.modelContext!.registerTool(webmcpTool);
+      } else {
+        // Use mock (dev panel will use internal registry)
+        getMockModelContext().registerTool(webmcpTool);
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+          console.debug(
+            `[webmcp-kit] Using mock modelContext for tool "${name}". ` +
+              'Native WebMCP not available.'
+          );
+        }
+      }
     },
 
     unregister() {
-      getContext().unregisterTool(name);
+      if (isWebMCPSupported()) {
+        navigator.modelContext!.unregisterTool(name);
+      } else {
+        getMockModelContext().unregisterTool(name);
+      }
     },
 
     async execute(input, agent) {

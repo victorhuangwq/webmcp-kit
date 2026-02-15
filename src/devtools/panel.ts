@@ -1,12 +1,49 @@
 import type { WebMCPTool, ToolResponse, JSONSchema } from '../types/index.js';
 import { toolRegistry } from '../mock/tool-registry.js';
 import { createMockAgent } from '../mock/agent.js';
+import { isWebMCPTestingSupported } from '../utils/feature-detect.js';
 
 interface PanelState {
   selectedTool: WebMCPTool | null;
   isMinimized: boolean;
   lastResult: { response: ToolResponse; time: number } | null;
   isExecuting: boolean;
+  useNativeAPI: boolean;
+}
+
+/**
+ * Get tools from the appropriate source
+ */
+function getTools(useNativeAPI: boolean): WebMCPTool[] {
+  if (useNativeAPI && navigator.modelContextTesting) {
+    return navigator.modelContextTesting.listTools();
+  }
+  return toolRegistry.getAll();
+}
+
+/**
+ * Get a specific tool by name
+ */
+function getTool(name: string, useNativeAPI: boolean): WebMCPTool | undefined {
+  if (useNativeAPI && navigator.modelContextTesting) {
+    return navigator.modelContextTesting.listTools().find(t => t.name === name);
+  }
+  return toolRegistry.get(name);
+}
+
+/**
+ * Execute a tool
+ */
+async function executeTool(
+  tool: WebMCPTool,
+  input: Record<string, unknown>,
+  useNativeAPI: boolean
+): Promise<ToolResponse> {
+  if (useNativeAPI && navigator.modelContextTesting) {
+    return navigator.modelContextTesting.executeTool(tool.name, input);
+  }
+  const agent = createMockAgent();
+  return tool.execute(input, agent);
 }
 
 /**
@@ -17,39 +54,58 @@ export function createPanel(): HTMLElement {
   const panel = document.createElement('div');
   panel.className = 'webmcp-panel';
 
+  // Check if native API is available
+  const useNativeAPI = isWebMCPTestingSupported();
+
   // State
   const state: PanelState = {
     selectedTool: null,
     isMinimized: false,
     lastResult: null,
     isExecuting: false,
+    useNativeAPI,
   };
 
   // Initial render
   render();
 
-  // Subscribe to tool registry changes
-  toolRegistry.subscribe(() => {
-    // If selected tool was removed, deselect it
-    if (state.selectedTool && !toolRegistry.get(state.selectedTool.name)) {
-      state.selectedTool = null;
-      state.lastResult = null;
-    }
-    render();
-  });
+  // Subscribe to changes
+  if (useNativeAPI && navigator.modelContextTesting) {
+    // Use native API's change callback
+    navigator.modelContextTesting.registerToolsChangedCallback(() => {
+      // If selected tool was removed, deselect it
+      if (state.selectedTool && !getTool(state.selectedTool.name, true)) {
+        state.selectedTool = null;
+        state.lastResult = null;
+      }
+      render();
+    });
+    console.debug('[webmcp-kit] Dev panel using native modelContextTesting API');
+  } else {
+    // Use internal registry
+    toolRegistry.subscribe(() => {
+      if (state.selectedTool && !toolRegistry.get(state.selectedTool.name)) {
+        state.selectedTool = null;
+        state.lastResult = null;
+      }
+      render();
+    });
+    console.debug('[webmcp-kit] Dev panel using mock tool registry');
+  }
 
   function render(): void {
-    const tools = toolRegistry.getAll();
+    const tools = getTools(state.useNativeAPI);
 
     panel.innerHTML = `
       <div class="panel-header">
         <div class="panel-title">
           <span>WebMCP DevTools</span>
           <span class="panel-badge">${tools.length}</span>
+          ${state.useNativeAPI ? '<span class="panel-native">Native</span>' : ''}
         </div>
         <div class="panel-controls">
           <button class="panel-btn" data-action="minimize" title="${state.isMinimized ? 'Expand' : 'Minimize'}">
-            ${state.isMinimized ? '□' : '−'}
+            ${state.isMinimized ? '+' : '−'}
           </button>
         </div>
       </div>
@@ -232,7 +288,7 @@ export function createPanel(): HTMLElement {
       el.addEventListener('click', () => {
         const toolName = el.dataset.tool;
         if (toolName) {
-          state.selectedTool = toolRegistry.get(toolName) ?? null;
+          state.selectedTool = getTool(toolName, state.useNativeAPI) ?? null;
           state.lastResult = null;
           render();
         }
@@ -304,8 +360,7 @@ export function createPanel(): HTMLElement {
 
       const startTime = performance.now();
       try {
-        const agent = createMockAgent();
-        const response = await state.selectedTool.execute(input, agent);
+        const response = await executeTool(state.selectedTool, input, state.useNativeAPI);
         state.lastResult = {
           response,
           time: Math.round(performance.now() - startTime),

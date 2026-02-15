@@ -1,1 +1,1 @@
-export { isWebMCPSupported, isBrowser } from './feature-detect.js';
+export { isWebMCPSupported, isWebMCPTestingSupported, isBrowser } from './feature-detect.js';

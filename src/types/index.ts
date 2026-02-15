@@ -11,4 +11,5 @@ export type {
   ToolAnnotations,
   WebMCPTool,
   ModelContext,
+  ModelContextTesting,
 } from './webmcp.js';

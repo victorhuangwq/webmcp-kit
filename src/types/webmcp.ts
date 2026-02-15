@@ -117,10 +117,26 @@ export interface ModelContext {
 }
 
 /**
+ * The navigator.modelContextTesting API surface (for agents/extensions)
+ * Available when WebMCP flag is enabled in Chrome
+ */
+export interface ModelContextTesting {
+  /** List all registered tools */
+  listTools(): WebMCPTool[];
+
+  /** Execute a tool by name */
+  executeTool(name: string, inputArgs: unknown): Promise<ToolResponse>;
+
+  /** Register a callback for when tools change */
+  registerToolsChangedCallback(callback: () => void): void;
+}
+
+/**
  * Augment the Navigator interface for TypeScript
  */
 declare global {
   interface Navigator {
     modelContext?: ModelContext;
+    modelContextTesting?: ModelContextTesting;
   }
 }

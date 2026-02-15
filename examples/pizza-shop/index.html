@@ -13,115 +13,193 @@
 
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #FFF2E3;
         min-height: 100vh;
-        padding: 40px 20px;
-        color: #1a1a2e;
+        color: #2D2D2D;
       }
 
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-      }
-
-      h1 {
+      header {
+        background: #0B7BC0;
         color: white;
-        text-align: center;
-        margin-bottom: 8px;
-        font-size: 2.5rem;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
       }
 
       .subtitle {
-        color: rgba(255, 255, 255, 0.8);
-        text-align: center;
-        margin-bottom: 40px;
+        font-size: 0.9rem;
+        opacity: 0.9;
       }
 
-      .card {
+      .main-layout {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      @media (max-width: 900px) {
+        .main-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .menu-section {
         background: white;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       }
 
-      h2 {
+      .menu-section h2 {
+        color: #006491;
         margin-bottom: 20px;
-        color: #333;
+        font-size: 1.4rem;
       }
 
       .menu-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 16px;
-        margin-bottom: 24px;
       }
 
       .menu-item {
-        background: #f8f9fa;
+        background: linear-gradient(135deg, #FFF9F2 0%, #FFF0E0 100%);
         border-radius: 12px;
         padding: 16px;
         text-align: center;
+        border: 1px solid #eee;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .menu-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
       .menu-item h3 {
         font-size: 1.1rem;
         margin-bottom: 8px;
+        color: #333;
+      }
+
+      .menu-item p {
+        color: #777;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
       }
 
       .menu-item .price {
-        color: #667eea;
+        color: #C8102E;
         font-weight: 600;
         font-size: 1.2rem;
       }
 
-      .cart {
-        background: #f8f9fa;
+      .cart-section {
+        background: white;
         border-radius: 12px;
-        padding: 20px;
-        margin-top: 24px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        height: fit-content;
+        position: sticky;
+        top: 24px;
       }
 
-      .cart h3 {
-        margin-bottom: 12px;
+      .cart-section h2 {
+        color: #006491;
+        margin-bottom: 16px;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .cart-badge {
+        background: #C8102E;
+        color: white;
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 12px;
       }
 
       .cart-items {
-        min-height: 60px;
-        color: #666;
+        min-height: 100px;
+        color: #888;
+        font-size: 0.95rem;
+        padding: 16px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        margin-bottom: 16px;
       }
 
       .instructions {
-        background: #e8f4f8;
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 24px;
+        background: #f0f8ff;
+        border-radius: 8px;
+        padding: 16px;
+        border-left: 3px solid #006491;
       }
 
       .instructions h3 {
-        color: #0077b6;
+        color: #006491;
         margin-bottom: 12px;
+        font-size: 0.95rem;
       }
 
       .instructions ol {
         padding-left: 20px;
+        font-size: 0.9rem;
         line-height: 1.8;
+        color: #555;
       }
 
       code {
-        background: #1e1e2e;
+        background: #2D2D2D;
         color: #a6e3a1;
         padding: 2px 8px;
         border-radius: 4px;
-        font-size: 0.9em;
+        font-size: 0.85em;
+      }
+
+      .checkout-btn {
+        width: 100%;
+        background: #C8102E;
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 12px;
+      }
+
+      .checkout-btn:hover {
+        background: #a00d24;
+      }
+
+      .checkout-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>🍕 Pizza Shop</h1>
-      <p class="subtitle">WebMCP Demo — Use the dev panel to interact with tools</p>
+    <header>
+      <h1>Pizza Shop</h1>
+      <span class="subtitle">WebMCP Demo</span>
+    </header>
 
-      <div class="card">
+    <div class="main-layout">
+      <div class="menu-section">
         <h2>Our Menu</h2>
         <div class="menu-grid">
           <div class="menu-item">
@@ -145,22 +223,22 @@
             <p class="price">$13.99</p>
           </div>
         </div>
+      </div>
 
-        <div class="cart">
-          <h3>🛒 Your Cart</h3>
-          <div class="cart-items" id="cart-display">
-            Your cart is empty. Use the tools to add items!
-          </div>
+      <div class="cart-section">
+        <h2>Your Cart <span class="cart-badge" id="cart-count">0</span></h2>
+        <div class="cart-items" id="cart-display">
+          Your cart is empty. Use the dev panel to add items!
         </div>
+        <button class="checkout-btn" disabled>Checkout</button>
 
         <div class="instructions">
           <h3>How to use</h3>
           <ol>
-            <li>Look for the <strong>WebMCP DevTools</strong> panel in the bottom-right corner</li>
-            <li>Click on <code>getMenu</code> to see available pizzas</li>
-            <li>Use <code>addToCart</code> with a pizza ID and quantity</li>
-            <li>Click <code>getCart</code> to see your cart</li>
-            <li>Use <code>checkout</code> to complete your order (will ask for confirmation)</li>
+            <li>Open the <strong>WebMCP DevTools</strong> panel (bottom-right)</li>
+            <li>Click <code>getMenu</code> to see pizzas</li>
+            <li>Use <code>addToCart</code> with a pizza ID</li>
+            <li>Click <code>checkout</code> to complete</li>
           </ol>
         </div>
       </div>

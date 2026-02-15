@@ -79,6 +79,17 @@ export const panelStyles = `
     font-weight: 500;
   }
 
+  .panel-native {
+    background: var(--panel-success);
+    color: var(--panel-bg);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
   .panel-controls {
     display: flex;
     gap: 4px;

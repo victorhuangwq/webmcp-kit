@@ -10,6 +10,18 @@ export function isWebMCPSupported(): boolean {
 }
 
 /**
+ * Check if the testing/agent API is available
+ * This is available when navigator.modelContext exists
+ */
+export function isWebMCPTestingSupported(): boolean {
+  return (
+    typeof navigator !== 'undefined' &&
+    'modelContextTesting' in navigator &&
+    navigator.modelContextTesting !== undefined
+  );
+}
+
+/**
  * Check if we're in a browser environment
  */
 export function isBrowser(): boolean {

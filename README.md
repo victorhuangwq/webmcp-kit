@@ -18,10 +18,11 @@ Major browsers are starting to experiment with implementations.
 
 webmcp-kit wraps the raw WebMCP API to make building tools easier:
 
-- **Type safety**: Define schemas with Zod, get full TypeScript inference in your execute function
-- **Auto JSON Schema**: Zod schemas convert to JSON Schema automatically
-- **Dev panel**: Test and debug tools in the browser without needing a real agent
+- **Zod schemas**: Define inputs once, get JSON Schema conversion and TypeScript inference
+- **Built-in validation**: Inputs are validated against your schema before `execute` runs
 - **Less boilerplate**: Feature detection, response formatting, and registration handled for you
+- **Automatic feature detection**: Works when the API exists, falls back gracefully when it doesn't
+- **Dev panel**: Test and debug tools in the browser without needing a real agent
 
 ```typescript
 import { defineTool } from 'webmcp-kit';
@@ -42,14 +43,6 @@ const addToCart = defineTool({
 
 addToCart.register();
 ```
-
-**What you get:**
-
-- **Zod schemas**: Define inputs once, get JSON Schema conversion and TypeScript inference
-- **Declarative registration**: Call `.register()` once, the library handles `navigator.modelContext`
-- **Automatic feature detection**: Works when the API exists, falls back gracefully when it doesn't
-- **Built-in validation**: Inputs are validated against your schema before `execute` runs
-- **Dev panel**: Test tools in the browser without needing an agent
 
 ## Install
 

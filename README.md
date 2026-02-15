@@ -169,7 +169,7 @@ Your code doesn't change based on environment. When browsers ship WebMCP support
 
 ## Examples
 
-See [`examples/pizza-shop`](./examples/pizza-shop) for a working demo.
+See [`examples/pizza-shop`](./examples/pizza-shop) for a working demo, with dev mode enabled. It shows a pizza ordering flow with multiple tools (getMenu, addToCart, checkout) and includes setup instructions for testing with native WebMCP.
 
 ## License
 

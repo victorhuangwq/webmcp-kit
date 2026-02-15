@@ -12,6 +12,7 @@ Major browsers are starting to experiment with implementations.
 - Chrome:
   - [WebMCP is available for early preview](https://developer.chrome.com/blog/webmcp-epp)
   - [WebMCP early preview](https://docs.google.com/document/d/1rtU1fRPS0bMqd9abMG_hc6K9OAI6soUy3Kh00toAgyk/edit?tab=t.0)
+  - TLDR: Download Chrome Canary (146+), go to `about:flags` and set ` WebMCP for testing` to enabled
 
 ## What does webmcp-kit do?
 

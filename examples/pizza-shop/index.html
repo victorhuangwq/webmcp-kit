@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pizza Shop - WebMCP Demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+        color: #1a1a2e;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: white;
+        text-align: center;
+        margin-bottom: 8px;
+        font-size: 2.5rem;
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      h2 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .menu-item {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+      }
+
+      .menu-item h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+      }
+
+      .menu-item .price {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 1.2rem;
+      }
+
+      .cart {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 24px;
+      }
+
+      .cart h3 {
+        margin-bottom: 12px;
+      }
+
+      .cart-items {
+        min-height: 60px;
+        color: #666;
+      }
+
+      .instructions {
+        background: #e8f4f8;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 24px;
+      }
+
+      .instructions h3 {
+        color: #0077b6;
+        margin-bottom: 12px;
+      }
+
+      .instructions ol {
+        padding-left: 20px;
+        line-height: 1.8;
+      }
+
+      code {
+        background: #1e1e2e;
+        color: #a6e3a1;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🍕 Pizza Shop</h1>
+      <p class="subtitle">WebMCP Demo — Use the dev panel to interact with tools</p>
+
+      <div class="card">
+        <h2>Our Menu</h2>
+        <div class="menu-grid">
+          <div class="menu-item">
+            <h3>Margherita</h3>
+            <p>Classic tomato & mozzarella</p>
+            <p class="price">$12.99</p>
+          </div>
+          <div class="menu-item">
+            <h3>Pepperoni</h3>
+            <p>Spicy pepperoni & cheese</p>
+            <p class="price">$14.99</p>
+          </div>
+          <div class="menu-item">
+            <h3>Hawaiian</h3>
+            <p>Ham & pineapple</p>
+            <p class="price">$13.99</p>
+          </div>
+          <div class="menu-item">
+            <h3>Veggie Supreme</h3>
+            <p>Fresh vegetables</p>
+            <p class="price">$13.99</p>
+          </div>
+        </div>
+
+        <div class="cart">
+          <h3>🛒 Your Cart</h3>
+          <div class="cart-items" id="cart-display">
+            Your cart is empty. Use the tools to add items!
+          </div>
+        </div>
+
+        <div class="instructions">
+          <h3>How to use</h3>
+          <ol>
+            <li>Look for the <strong>WebMCP DevTools</strong> panel in the bottom-right corner</li>
+            <li>Click on <code>getMenu</code> to see available pizzas</li>
+            <li>Use <code>addToCart</code> with a pizza ID and quantity</li>
+            <li>Click <code>getCart</code> to see your cart</li>
+            <li>Use <code>checkout</code> to complete your order (will ask for confirmation)</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

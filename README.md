@@ -18,10 +18,10 @@ Major browsers are starting to experiment with implementations.
 
 webmcp-kit is a type-safe library that wraps the WebMCP API to make it easier to use. The raw API works, but has some rough edges:
 
-- **No type safety** — `inputSchema` is raw JSON Schema, `execute` receives `unknown`
-- **Manual JSON Schema** — Writing schemas by hand is verbose and error-prone
-- **No dev tooling** — Hard to test tools without a real agent
-- **Boilerplate** — Checking if `navigator.modelContext` exists, formatting responses
+- **No type safety**: `inputSchema` is raw JSON Schema, `execute` receives `unknown`
+- **Manual JSON Schema**: Writing schemas by hand is verbose and error-prone
+- **No dev tooling**: Hard to test tools without a real agent
+- **Boilerplate**: Checking if `navigator.modelContext` exists, formatting responses
 
 ```typescript
 import { defineTool } from 'webmcp-kit';
@@ -45,11 +45,11 @@ addToCart.register();
 
 **What you get:**
 
-- **Zod schemas** — Define inputs once, get JSON Schema conversion and TypeScript inference
-- **Declarative registration** — Call `.register()` once, the library handles `navigator.modelContext`
-- **Automatic feature detection** — Works when the API exists, falls back gracefully when it doesn't
-- **Built-in validation** — Inputs are validated against your schema before `execute` runs
-- **Dev panel** — Test tools in the browser without needing an agent
+- **Zod schemas**: Define inputs once, get JSON Schema conversion and TypeScript inference
+- **Declarative registration**: Call `.register()` once, the library handles `navigator.modelContext`
+- **Automatic feature detection**: Works when the API exists, falls back gracefully when it doesn't
+- **Built-in validation**: Inputs are validated against your schema before `execute` runs
+- **Dev panel**: Test tools in the browser without needing an agent
 
 ## Install
 

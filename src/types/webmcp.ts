@@ -124,8 +124,8 @@ export interface ModelContextTesting {
   /** List all registered tools */
   listTools(): WebMCPTool[];
 
-  /** Execute a tool by name */
-  executeTool(name: string, inputArgs: unknown): Promise<ToolResponse>;
+  /** Execute a tool by name (inputArgs should be JSON string) */
+  executeTool(name: string, inputArgs: string): Promise<ToolResponse>;
 
   /** Register a callback for when tools change */
   registerToolsChangedCallback(callback: () => void): void;

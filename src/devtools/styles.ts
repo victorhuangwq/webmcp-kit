@@ -317,11 +317,14 @@ export const panelStyles = `
   .result-content {
     padding: 12px;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11px;
     white-space: pre-wrap;
     word-break: break-word;
-    max-height: 150px;
+    max-height: 250px;
     overflow-y: auto;
-    line-height: 1.5;
+    line-height: 1.4;
+    background: var(--panel-bg);
+    border-radius: 0 0 8px 8px;
+    margin: 0;
   }
 `;

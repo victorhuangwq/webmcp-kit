@@ -40,7 +40,8 @@ async function executeTool(
   useNativeAPI: boolean
 ): Promise<ToolResponse> {
   if (useNativeAPI && navigator.modelContextTesting) {
-    return navigator.modelContextTesting.executeTool(tool.name, input);
+    // Native API expects inputArgs as JSON string
+    return navigator.modelContextTesting.executeTool(tool.name, JSON.stringify(input));
   }
   const agent = createMockAgent();
   return tool.execute(input, agent);
@@ -261,13 +262,21 @@ export function createPanel(): HTMLElement {
   }
 
   function renderResult(result: { response: ToolResponse; time: number }): string {
-    const isError = result.response.isError;
-    const content = result.response.content
-      .map(c => {
-        if (c.type === 'text') return c.text;
-        return JSON.stringify(c);
-      })
-      .join('\n');
+    const response = result.response;
+    const isError = response?.isError;
+
+    let content: string;
+    if (response?.content && Array.isArray(response.content)) {
+      content = response.content
+        .map(c => {
+          if (c.type === 'text') return c.text;
+          return JSON.stringify(c);
+        })
+        .join('\n');
+    } else {
+      // Fallback: stringify the whole response
+      content = JSON.stringify(response, null, 2);
+    }
 
     return `
       <div class="result-container">

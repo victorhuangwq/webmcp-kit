@@ -9,6 +9,9 @@ Type-safe WebMCP tools with Zod.
 The API adds `navigator.modelContext`, which websites use to register tools that agents can discover and call. Think of it like making your site's functionality available to AI assistants.
 
 Major browsers are starting to experiment with implementations.
+- Chrome:
+  - [WebMCP is available for early preview](https://developer.chrome.com/blog/webmcp-epp)
+  - [WebMCP early preview](https://docs.google.com/document/d/1rtU1fRPS0bMqd9abMG_hc6K9OAI6soUy3Kh00toAgyk/edit?tab=t.0)
 
 ## What does webmcp-kit do?
 

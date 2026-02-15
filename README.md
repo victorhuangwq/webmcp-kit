@@ -164,6 +164,13 @@ Your code doesn't change based on environment. When browsers ship WebMCP support
 
 See [`examples/pizza-shop`](./examples/pizza-shop) for a working demo, with dev mode enabled. It shows a pizza ordering flow with multiple tools (getMenu, addToCart, checkout) and includes setup instructions for testing with native WebMCP.
 
+## Support
+
+If you find webmcp-kit useful:
+
+- **Star the repo**: It helps others discover the project
+- **Report issues**: Found a bug or have a feature request? [Open an issue](https://github.com/victorhuangwq/webmcp-kit/issues)
+
 ## License
 
 MIT

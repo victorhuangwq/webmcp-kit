@@ -16,12 +16,12 @@ Major browsers are starting to experiment with implementations.
 
 ## What does webmcp-kit do?
 
-webmcp-kit is a type-safe library that wraps the WebMCP API to make it easier to use. The raw API works, but has some rough edges:
+webmcp-kit wraps the raw WebMCP API to make building tools easier:
 
-- **No type safety**: `inputSchema` is raw JSON Schema, `execute` receives `unknown`
-- **Manual JSON Schema**: Writing schemas by hand is verbose and error-prone
-- **No dev tooling**: Hard to test tools without a real agent
-- **Boilerplate**: Checking if `navigator.modelContext` exists, formatting responses
+- **Type safety**: Define schemas with Zod, get full TypeScript inference in your execute function
+- **Auto JSON Schema**: Zod schemas convert to JSON Schema automatically
+- **Dev panel**: Test and debug tools in the browser without needing a real agent
+- **Less boilerplate**: Feature detection, response formatting, and registration handled for you
 
 ```typescript
 import { defineTool } from 'webmcp-kit';

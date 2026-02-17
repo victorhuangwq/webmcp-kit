@@ -24,3 +24,7 @@ coverage/
 # Environment
 .env
 .env.local
+
+# Agent skills
+.claude/
+.agents/

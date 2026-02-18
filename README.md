@@ -2,7 +2,6 @@
 
 [![npm version](https://img.shields.io/npm/v/webmcp-kit)](https://www.npmjs.com/package/webmcp-kit)
 [![npm downloads](https://img.shields.io/npm/dm/webmcp-kit)](https://www.npmjs.com/package/webmcp-kit)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/webmcp-kit)](https://bundlephobia.com/package/webmcp-kit)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/victorhuangwq/webmcp-kit/blob/main/LICENSE)
 [![types: TypeScript](https://img.shields.io/badge/types-TypeScript-3178C6.svg)](https://www.typescriptlang.org/)
 

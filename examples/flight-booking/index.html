@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkyHop Flights - WebMCP Demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Trebuchet MS', 'Avenir Next', 'Segoe UI', sans-serif;
+        min-height: 100vh;
+        background: radial-gradient(circle at top left, #d8f1ff 0%, #f7fbff 40%, #eef4ff 100%);
+        color: #12263a;
+      }
+
+      header {
+        background: linear-gradient(90deg, #0f4c81 0%, #1a6fb0 100%);
+        color: #fff;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      header h1 {
+        font-size: 1.4rem;
+        letter-spacing: 0.02em;
+      }
+
+      .subtitle {
+        opacity: 0.9;
+        font-size: 0.9rem;
+      }
+
+      .main-layout {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+      }
+
+      @media (max-width: 950px) {
+        .main-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        background: #fff;
+        border: 1px solid #d5e2f2;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(21, 55, 93, 0.08);
+      }
+
+      .search-panel {
+        padding: 24px;
+      }
+
+      .search-panel h2 {
+        margin-bottom: 16px;
+        color: #0f4c81;
+      }
+
+      .flight-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+      }
+
+      .flight-card {
+        background: linear-gradient(160deg, #f4f9ff 0%, #edf3ff 100%);
+        border: 1px solid #d5e2f2;
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .flight-card h3 {
+        font-size: 1rem;
+        margin-bottom: 8px;
+      }
+
+      .flight-card p {
+        font-size: 0.88rem;
+        color: #42546b;
+        margin-bottom: 5px;
+      }
+
+      .price {
+        color: #0b8f5a;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+
+      .summary-panel {
+        padding: 20px;
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+      }
+
+      .summary-panel h2 {
+        color: #0f4c81;
+        margin-bottom: 14px;
+      }
+
+      .step-list {
+        list-style: none;
+        display: grid;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .step-item {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #d9e4f4;
+        background: #f8fbff;
+        font-size: 0.9rem;
+      }
+
+      .step-item.done {
+        border-color: #82c9a8;
+        background: #effaf4;
+      }
+
+      .booking-status {
+        background: #f7fafd;
+        border: 1px solid #d9e4f4;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 0.9rem;
+        color: #41546f;
+        line-height: 1.5;
+        min-height: 120px;
+      }
+
+      .instructions {
+        margin-top: 16px;
+        background: #f0f7ff;
+        border-left: 3px solid #1a6fb0;
+        border-radius: 8px;
+        padding: 12px;
+      }
+
+      .instructions h3 {
+        color: #0f4c81;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+      }
+
+      .instructions ol {
+        padding-left: 18px;
+        font-size: 0.88rem;
+        line-height: 1.7;
+        color: #34465b;
+      }
+
+      code {
+        background: #132238;
+        color: #9ed8ff;
+        padding: 2px 7px;
+        border-radius: 5px;
+      }
+
+      .purchase-btn {
+        width: 100%;
+        margin-top: 14px;
+        padding: 12px;
+        border: 0;
+        border-radius: 9px;
+        font-weight: 700;
+        color: #fff;
+        background: #0b8f5a;
+        cursor: pointer;
+      }
+
+      .purchase-btn:disabled {
+        background: #aac3b6;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>SkyHop Flight Booking</h1>
+      <span class="subtitle">WebMCP multi-step purchase demo</span>
+    </header>
+
+    <div class="main-layout">
+      <section class="panel search-panel">
+        <h2>Sample Flight Options</h2>
+        <div class="flight-grid">
+          <article class="flight-card">
+            <h3>SF301 · SFO to JFK</h3>
+            <p>08:10 - 16:45 (non-stop)</p>
+            <p>Economy / Premium / Business</p>
+            <p class="price">From $289</p>
+          </article>
+          <article class="flight-card">
+            <h3>SF455 · SFO to ORD</h3>
+            <p>09:25 - 15:15 (1 stop)</p>
+            <p>Economy / Premium</p>
+            <p class="price">From $208</p>
+          </article>
+          <article class="flight-card">
+            <h3>SF522 · LAX to SEA</h3>
+            <p>13:05 - 15:44 (non-stop)</p>
+            <p>Economy / Business</p>
+            <p class="price">From $136</p>
+          </article>
+          <article class="flight-card">
+            <h3>SF888 · JFK to MIA</h3>
+            <p>17:15 - 20:28 (non-stop)</p>
+            <p>Economy / Premium / Business</p>
+            <p class="price">From $162</p>
+          </article>
+        </div>
+      </section>
+
+      <aside class="panel summary-panel">
+        <h2>Booking Progress</h2>
+        <ul class="step-list" id="step-list">
+          <li class="step-item" id="step-search">1. Search flights</li>
+          <li class="step-item" id="step-select">2. Select a flight</li>
+          <li class="step-item" id="step-travelers">3. Add travelers</li>
+          <li class="step-item" id="step-extras">4. Add extras (optional)</li>
+          <li class="step-item" id="step-purchase">5. Purchase</li>
+        </ul>
+
+        <div class="booking-status" id="booking-status">
+          No booking started. Use the WebMCP dev panel to begin.
+        </div>
+
+        <button class="purchase-btn" disabled>Purchase Flight</button>
+
+        <div class="instructions">
+          <h3>How to use</h3>
+          <ol>
+            <li>Run <code>searchFlights</code> to get matching flights</li>
+            <li>Run <code>selectFlight</code> with a <code>flightId</code></li>
+            <li>Run <code>addTraveler</code> for each traveler</li>
+            <li>Optionally run <code>addExtras</code>, then <code>purchaseFlight</code></li>
+          </ol>
+        </div>
+      </aside>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

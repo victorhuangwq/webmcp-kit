@@ -57,6 +57,25 @@ npm install webmcp-kit zod
 
 Requires Zod v4.
 
+## Install and Use the `add-webmcp-tools` Skill
+
+Install the skill from this repository using Vercel's Skills CLI:
+
+```bash
+npx skills add victorhuangwq/webmcp-kit
+```
+
+Then invoke it with requests like:
+- "add a webmcp tool for search"
+- "debug why my tool is not in dev panel"
+- "update tool schema and validation"
+
+References:
+- Skill definition: [`skills/add-webmcp-tools/SKILL.md`](./skills/add-webmcp-tools/SKILL.md)
+- Working demos:
+  - [`examples/pizza-shop/README.md`](./examples/pizza-shop/README.md)
+  - [`examples/flight-booking/README.md`](./examples/flight-booking/README.md)
+
 ## Usage
 
 ### Define a Tool
@@ -167,7 +186,10 @@ Your code doesn't change based on environment. When browsers ship WebMCP support
 
 ## Examples
 
-See [`examples/pizza-shop`](./examples/pizza-shop) for a working demo, with dev mode enabled. It shows a pizza ordering flow with multiple tools (getMenu, addToCart, checkout) and includes setup instructions for testing with native WebMCP.
+- [`examples/pizza-shop`](./examples/pizza-shop): pizza ordering flow with multiple tools (`getMenu`, `addToCart`, `checkout`).
+- [`examples/flight-booking`](./examples/flight-booking): multi-step flight purchase flow (`searchFlights`, `selectFlight`, `addTraveler`, `addExtras`, `purchaseFlight`).
+
+Both examples include setup instructions for testing with native WebMCP and mock mode.
 
 ## Support
 

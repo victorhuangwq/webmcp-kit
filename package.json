@@ -1,6 +1,6 @@
 {
   "name": "webmcp-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Build and test WebMCP tools — in any browser",
   "type": "module",
   "exports": {

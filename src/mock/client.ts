@@ -1,11 +1,11 @@
 import type {
-  WebMCPAgent,
+  ModelContextClient,
   UserInteractionOptions,
   UserInteractionResult,
 } from '../types/index.js';
 import { isBrowser } from '../utils/feature-detect.js';
 
-export interface MockAgentOptions {
+export interface MockClientOptions {
   /** Custom handler for requestUserInteraction calls */
   onUserInteraction?: (
     options: UserInteractionOptions
@@ -13,20 +13,18 @@ export interface MockAgentOptions {
 }
 
 /**
- * Create a mock agent for dev/testing scenarios
- * Uses browser dialogs by default, or custom handler if provided
+ * Create a mock ModelContextClient for dev/testing scenarios.
+ * Uses browser dialogs by default, or a custom handler if provided.
  */
-export function createMockAgent(options?: MockAgentOptions): WebMCPAgent {
+export function createMockClient(options?: MockClientOptions): ModelContextClient {
   return {
     async requestUserInteraction(
       interactionOptions?: UserInteractionOptions
     ): Promise<UserInteractionResult> {
-      // Use custom handler if provided
       if (options?.onUserInteraction) {
         return options.onUserInteraction(interactionOptions ?? {});
       }
 
-      // In Node.js environment, auto-confirm for testing
       if (!isBrowser()) {
         return { confirmed: true };
       }

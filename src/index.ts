@@ -10,14 +10,18 @@ export {
   jsonContent,
   errorContent,
 } from './core/response-helpers.js';
+export {
+  getRegisteredTools,
+  unregisterAll,
+} from './core/registration-tracker.js';
 
 // Mock (for testing and dev)
 export {
   toolRegistry,
-  createMockAgent,
+  createMockClient,
   getMockModelContext,
   resetMockModelContext,
-  type MockAgentOptions,
+  type MockClientOptions,
   type ToolRegistryListener,
 } from './mock/index.js';
 
@@ -34,8 +38,9 @@ export type {
   ToolResponse,
   UserInteractionOptions,
   UserInteractionResult,
-  WebMCPAgent,
+  ModelContextClient,
   ToolAnnotations,
   WebMCPTool,
   ModelContext,
+  ModelContextRegisterToolOptions,
 } from './types/index.js';

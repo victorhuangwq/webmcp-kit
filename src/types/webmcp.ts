@@ -1,6 +1,7 @@
 /**
  * WebMCP Spec Types
- * Based on the W3C WebMCP specification (Chrome 146 Early Preview)
+ * Based on the W3C WebMCP specification:
+ * https://webmachinelearning.github.io/webmcp/
  */
 
 /**
@@ -50,7 +51,11 @@ export interface ToolResponse {
 }
 
 /**
- * Options for requestUserInteraction
+ * Options for requestUserInteraction (kit-level ergonomic surface).
+ *
+ * The native spec defines `requestUserInteraction(callback)` where the
+ * callback returns a promise — webmcp-kit wraps that with this higher-level
+ * options bag, translating to dialogs/prompts in mock mode.
  */
 export interface UserInteractionOptions {
   prompt?: string;
@@ -68,10 +73,12 @@ export interface UserInteractionResult {
 }
 
 /**
- * The agent object passed to tool execute callbacks
- * Provides browser-mediated interaction capabilities
+ * The client object passed to tool execute callbacks.
+ * Provides browser-mediated interaction capabilities.
+ *
+ * Named after the spec's `ModelContextClient` interface.
  */
-export interface WebMCPAgent {
+export interface ModelContextClient {
   /**
    * Request user interaction during tool execution.
    * Can be invoked multiple times within a single execution.
@@ -82,17 +89,13 @@ export interface WebMCPAgent {
 }
 
 /**
- * Tool annotations for metadata
+ * Tool annotations for metadata, matching the spec's ToolAnnotations.
  */
 export interface ToolAnnotations {
   /** Indicates the tool does not modify external state */
   readOnlyHint?: boolean;
-  /** Indicates the tool may have destructive side effects */
-  destructiveHint?: boolean;
-  /** Human-in-the-loop confirmation recommended */
-  confirmationHint?: boolean;
-  /** Custom annotations */
-  [key: string]: unknown;
+  /** Indicates the tool may surface untrusted third-party content to the model */
+  untrustedContentHint?: boolean;
 }
 
 /**
@@ -100,25 +103,41 @@ export interface ToolAnnotations {
  */
 export interface WebMCPTool {
   name: string;
+  /** Optional human-friendly title (USVString in the spec) */
+  title?: string;
   description: string;
   inputSchema: JSONSchema;
-  execute: (input: unknown, agent: WebMCPAgent) => Promise<ToolResponse>;
+  execute: (input: unknown, client: ModelContextClient) => Promise<ToolResponse>;
   annotations?: ToolAnnotations;
 }
 
 /**
- * The navigator.modelContext API surface
+ * Options bag accepted by navigator.modelContext.registerTool().
+ * Aborting `signal` unregisters the tool.
  */
-export interface ModelContext {
-  provideContext(context: { tools: WebMCPTool[] }): void;
-  clearContext(): void;
-  registerTool(tool: WebMCPTool): void;
-  unregisterTool(name: string): void;
+export interface ModelContextRegisterToolOptions {
+  signal?: AbortSignal;
 }
 
 /**
- * The navigator.modelContextTesting API surface (for agents/extensions)
- * Available when WebMCP flag is enabled in Chrome
+ * The navigator.modelContext API surface.
+ *
+ * Per the latest spec, `registerTool` is the only method. Tools are
+ * unregistered by aborting the AbortSignal passed at registration time —
+ * there is no longer a `provideContext`, `clearContext`, or `unregisterTool`.
+ */
+export interface ModelContext {
+  registerTool(
+    tool: WebMCPTool,
+    options?: ModelContextRegisterToolOptions
+  ): void;
+}
+
+/**
+ * The navigator.modelContextTesting API surface (for agents/extensions).
+ *
+ * Not part of the current spec, but Chrome 146 Early Preview still exposes
+ * it, and the dev panel relies on it in native mode.
  */
 export interface ModelContextTesting {
   /** List all registered tools */

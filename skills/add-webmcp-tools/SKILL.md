@@ -158,25 +158,38 @@ Completion checks:
 
 ## Destructive or Sensitive Actions
 
-For delete/checkout/payment/account changes:
-1. Add `annotations: { destructiveHint: true }` (or `confirmationHint: true`)
-2. Request user confirmation in `execute` before mutation
-3. Return cancellation result when confirmation is denied
+The spec's `ToolAnnotations` is just `{ readOnlyHint?, untrustedContentHint? }` — there is no `destructiveHint` or `confirmationHint`. For sensitive actions:
+
+1. Do **not** set `readOnlyHint: true` (it is read-only by default — only set it for tools that genuinely make no state changes).
+2. Set `untrustedContentHint: true` if the tool surfaces third-party / user-generated content the model should treat as untrusted.
+3. Request user confirmation in `execute` via `client.requestUserInteraction(...)` before mutation, and return a cancellation result when the user declines.
 
 Pattern:
 
 ```typescript
 const deleteItem = defineTool({
-  // ...
-  annotations: { destructiveHint: true },
-  execute: async (input, agent) => {
-    const { confirmed } = await agent.requestUserInteraction({
-      prompt: 'Are you sure?',
+  name: 'deleteItem',
+  description: 'Delete an item by id',
+  inputSchema: z.object({ id: z.string() }),
+  execute: async ({ id }, client) => {
+    const { confirmed } = await client.requestUserInteraction({
+      prompt: `Delete item ${id}?`,
       type: 'confirmation',
     });
     if (!confirmed) return 'Cancelled';
     // perform mutation
+    return `Deleted ${id}`;
   },
+});
+```
+
+For read-only tools, set the hint:
+
+```typescript
+const searchProducts = defineTool({
+  // ...
+  annotations: { readOnlyHint: true },
+  execute: async ({ query }) => { /* ... */ },
 });
 ```
 
@@ -189,7 +202,8 @@ const deleteItem = defineTool({
 - Tool is registered with `.register()` in startup path
 - `enableDevMode()` is enabled when local testing is requested
 - Native vs mock behavior is explicitly validated
-- Sensitive actions require confirmation flow
+- Sensitive actions request confirmation via `client.requestUserInteraction(...)`
+- `readOnlyHint` / `untrustedContentHint` set only when accurate
 
 ## Expected Output
 

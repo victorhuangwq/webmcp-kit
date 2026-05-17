@@ -7,9 +7,10 @@ export type {
   ToolResponse,
   UserInteractionOptions,
   UserInteractionResult,
-  WebMCPAgent,
+  ModelContextClient,
   ToolAnnotations,
   WebMCPTool,
   ModelContext,
+  ModelContextRegisterToolOptions,
   ModelContextTesting,
 } from './webmcp.js';

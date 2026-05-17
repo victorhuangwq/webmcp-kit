@@ -27,17 +27,6 @@ class ToolRegistry {
   }
 
   /**
-   * Replace all tools
-   */
-  setAll(tools: WebMCPTool[]): void {
-    this.tools.clear();
-    for (const tool of tools) {
-      this.tools.set(tool.name, tool);
-    }
-    this.notify();
-  }
-
-  /**
    * Clear all tools
    */
   clear(): void {

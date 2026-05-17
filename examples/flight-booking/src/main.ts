@@ -341,7 +341,7 @@ const purchaseFlightTool = defineTool({
     paymentMethod: z.enum(['card', 'wallet', 'points']).default('card'),
     email: z.string().email().describe('Booking confirmation email address'),
   }),
-  execute: async ({ paymentMethod, email }, agent) => {
+  execute: async ({ paymentMethod, email }, client) => {
     if (!booking.search || !booking.selectedFlight) {
       return 'No active booking. Search and select a flight first.';
     }
@@ -351,7 +351,7 @@ const purchaseFlightTool = defineTool({
     }
 
     const total = computeTotal();
-    const confirmation = await agent.requestUserInteraction({
+    const confirmation = await client.requestUserInteraction({
       type: 'confirmation',
       prompt: `Confirm purchase for $${total.toFixed(2)}?\nFlight: ${booking.selectedFlight.id} (${booking.selectedFlight.from}-${booking.selectedFlight.to})\nTravelers: ${booking.travelers.length}\nPayment: ${paymentMethod}\nEmail: ${email}`,
     });

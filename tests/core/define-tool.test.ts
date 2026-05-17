@@ -1,9 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
 import { defineTool } from '../../src/core/define-tool.js';
 import { toolRegistry } from '../../src/mock/tool-registry.js';
 
 describe('defineTool', () => {
+  beforeEach(() => {
+    toolRegistry.clear();
+  });
+
   it('creates a tool with correct metadata', () => {
     const tool = defineTool({
       name: 'test-tool',
@@ -19,6 +23,19 @@ describe('defineTool', () => {
     expect(tool.description).toBe('A test tool');
     expect(tool.inputSchema).toBeDefined();
     expect(tool.inputSchema.type).toBe('object');
+  });
+
+  it('forwards optional title to the raw WebMCP tool shape', () => {
+    const tool = defineTool({
+      name: 'titled',
+      title: 'A Friendly Title',
+      description: 'Has a title',
+      inputSchema: z.object({}),
+      execute: async () => 'OK',
+    });
+
+    expect(tool.title).toBe('A Friendly Title');
+    expect(tool.toWebMCPTool().title).toBe('A Friendly Title');
   });
 
   it('executes with valid input', async () => {
@@ -88,7 +105,7 @@ describe('defineTool', () => {
     expect(registered?.name).toBe('registerable');
   });
 
-  it('unregisters from mock modelContext', () => {
+  it('unregisters from mock modelContext via abort signal', () => {
     const tool = defineTool({
       name: 'temporary',
       description: 'Will be removed',
@@ -103,15 +120,59 @@ describe('defineTool', () => {
     expect(toolRegistry.get('temporary')).toBeUndefined();
   });
 
-  it('provides agent to execute callback', async () => {
+  it('register is idempotent — duplicate calls do not double-register', () => {
+    const tool = defineTool({
+      name: 'idempotent',
+      description: 'Registers once',
+      inputSchema: z.object({}),
+      execute: async () => 'OK',
+    });
+
+    tool.register();
+    tool.register();
+
+    expect(toolRegistry.getAll().filter((t) => t.name === 'idempotent')).toHaveLength(1);
+
+    tool.unregister();
+    expect(toolRegistry.get('idempotent')).toBeUndefined();
+  });
+
+  it('can register again after unregistering', () => {
+    const tool = defineTool({
+      name: 'recyclable',
+      description: 'Can be registered twice',
+      inputSchema: z.object({}),
+      execute: async () => 'OK',
+    });
+
+    tool.register();
+    tool.unregister();
+    expect(toolRegistry.get('recyclable')).toBeUndefined();
+
+    tool.register();
+    expect(toolRegistry.get('recyclable')).toBeDefined();
+  });
+
+  it('unregister is a no-op when never registered', () => {
+    const tool = defineTool({
+      name: 'never-registered',
+      description: 'Was never registered',
+      inputSchema: z.object({}),
+      execute: async () => 'OK',
+    });
+
+    expect(() => tool.unregister()).not.toThrow();
+  });
+
+  it('provides client to execute callback', async () => {
     const mockHandler = vi.fn().mockResolvedValue({ confirmed: true });
 
     const tool = defineTool({
-      name: 'agent-user',
-      description: 'Uses agent',
+      name: 'client-user',
+      description: 'Uses client',
       inputSchema: z.object({}),
-      execute: async (_, agent) => {
-        const result = await agent.requestUserInteraction({ prompt: 'Confirm?' });
+      execute: async (_, client) => {
+        const result = await client.requestUserInteraction({ prompt: 'Confirm?' });
         return result.confirmed ? 'Confirmed' : 'Cancelled';
       },
     });

@@ -186,7 +186,7 @@ const checkoutTool = defineTool({
     deliveryAddress: z.string().optional().describe('Delivery address (optional for pickup)'),
     paymentMethod: z.enum(['card', 'cash']).optional().describe('Payment method'),
   }),
-  execute: async ({ deliveryAddress, paymentMethod = 'card' }, agent) => {
+  execute: async ({ deliveryAddress, paymentMethod = 'card' }, client) => {
     if (cart.length === 0) {
       return 'Cannot checkout with an empty cart. Add some pizzas first!';
     }
@@ -197,7 +197,7 @@ const checkoutTool = defineTool({
     );
 
     // Request user confirmation
-    const { confirmed } = await agent.requestUserInteraction({
+    const { confirmed } = await client.requestUserInteraction({
       prompt: `Complete order for $${total.toFixed(2)}?\n\nItems:\n${cart
         .map((item) => `- ${item.quantity}x ${item.pizza.name} (${item.size})`)
         .join('\n')}\n\nPayment: ${paymentMethod}${deliveryAddress ? `\nDelivery: ${deliveryAddress}` : ' (pickup)'}`,

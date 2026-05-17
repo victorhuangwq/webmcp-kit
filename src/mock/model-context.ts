@@ -1,34 +1,40 @@
-import type { ModelContext, WebMCPTool } from '../types/index.js';
+import type {
+  ModelContext,
+  ModelContextRegisterToolOptions,
+  WebMCPTool,
+} from '../types/index.js';
 import { toolRegistry } from './tool-registry.js';
 
 /**
- * Spec-compliant mock of navigator.modelContext
- * Used when the native API is not available
+ * Spec-compliant mock of navigator.modelContext.
+ *
+ * Mirrors the latest WebMCP spec: only `registerTool` is exposed, and tools
+ * are removed by aborting the AbortSignal passed via options.
  */
 class MockModelContext implements ModelContext {
-  provideContext(context: { tools: WebMCPTool[] }): void {
-    toolRegistry.setAll(context.tools);
-  }
+  registerTool(tool: WebMCPTool, options?: ModelContextRegisterToolOptions): void {
+    const signal = options?.signal;
+    if (signal?.aborted) {
+      return;
+    }
 
-  clearContext(): void {
-    toolRegistry.clear();
-  }
-
-  registerTool(tool: WebMCPTool): void {
     toolRegistry.register(tool);
-  }
 
-  unregisterTool(name: string): void {
-    toolRegistry.unregister(name);
+    if (signal) {
+      signal.addEventListener(
+        'abort',
+        () => toolRegistry.unregister(tool.name),
+        { once: true }
+      );
+    }
   }
 }
 
-// Singleton instance
 let mockModelContext: MockModelContext | null = null;
 
 /**
- * Get the mock ModelContext instance
- * Creates it lazily on first access
+ * Get the mock ModelContext instance.
+ * Creates it lazily on first access.
  */
 export function getMockModelContext(): ModelContext {
   if (!mockModelContext) {
@@ -38,7 +44,7 @@ export function getMockModelContext(): ModelContext {
 }
 
 /**
- * Reset the mock for testing
+ * Reset the mock for testing.
  */
 export function resetMockModelContext(): void {
   mockModelContext = null;

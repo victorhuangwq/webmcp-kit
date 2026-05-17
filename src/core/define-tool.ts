@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 import type {
   JSONSchema,
-  WebMCPAgent,
+  ModelContextClient,
   WebMCPTool,
   ToolResponse,
   ToolAnnotations,
@@ -10,7 +10,11 @@ import { zodToJsonSchema } from './schema-converter.js';
 import { wrapResponse, errorContent } from './response-helpers.js';
 import { isWebMCPSupported } from '../utils/feature-detect.js';
 import { getMockModelContext } from '../mock/model-context.js';
-import { createMockAgent } from '../mock/agent.js';
+import { createMockClient } from '../mock/client.js';
+import {
+  trackRegistration,
+  untrackRegistration,
+} from './registration-tracker.js';
 
 /**
  * Tool definition input - what you pass to defineTool()
@@ -18,6 +22,9 @@ import { createMockAgent } from '../mock/agent.js';
 export interface ToolDefinition<TSchema extends z.ZodTypeAny> {
   /** Unique identifier for the tool */
   name: string;
+
+  /** Optional human-friendly title */
+  title?: string;
 
   /** Human-readable description of what the tool does */
   description: string;
@@ -27,12 +34,12 @@ export interface ToolDefinition<TSchema extends z.ZodTypeAny> {
 
   /**
    * The implementation function.
-   * Receives validated input and an agent for user interaction.
+   * Receives validated input and a client for user interaction.
    * Can return a string (auto-wrapped) or a full ToolResponse.
    */
   execute: (
     input: z.infer<TSchema>,
-    agent: WebMCPAgent
+    client: ModelContextClient
   ) => Promise<string | ToolResponse>;
 
   /** Optional tool annotations/metadata */
@@ -45,6 +52,9 @@ export interface ToolDefinition<TSchema extends z.ZodTypeAny> {
 export interface Tool<TSchema extends z.ZodTypeAny> {
   /** The tool name */
   readonly name: string;
+
+  /** Optional tool title */
+  readonly title?: string;
 
   /** The tool description */
   readonly description: string;
@@ -61,11 +71,16 @@ export interface Tool<TSchema extends z.ZodTypeAny> {
   /**
    * Register this tool with navigator.modelContext.
    * Falls back to mock in dev mode.
+   *
+   * Idempotent: calling on an already-registered tool is a no-op.
+   * The kit owns an internal AbortController per registration; call
+   * `unregister()` to abort it.
    */
   register(): void;
 
   /**
-   * Unregister this tool from navigator.modelContext.
+   * Unregister this tool by aborting its internal AbortSignal.
+   * Safe to call when not registered (no-op).
    */
   unregister(): void;
 
@@ -73,7 +88,7 @@ export interface Tool<TSchema extends z.ZodTypeAny> {
    * Execute the tool directly (for testing).
    * Validates input before calling the execute callback.
    */
-  execute(input: z.infer<TSchema>, agent?: WebMCPAgent): Promise<ToolResponse>;
+  execute(input: z.infer<TSchema>, client?: ModelContextClient): Promise<ToolResponse>;
 
   /**
    * Get the raw WebMCP tool shape for direct use.
@@ -96,8 +111,8 @@ export interface Tool<TSchema extends z.ZodTypeAny> {
  *     productId: z.string().describe('The product ID'),
  *     quantity: z.number().min(1).describe('Number of items'),
  *   }),
- *   execute: async ({ productId, quantity }, agent) => {
- *     // agent.requestUserInteraction() is available here
+ *   execute: async ({ productId, quantity }, client) => {
+ *     // client.requestUserInteraction() is available here
  *     await cart.add(productId, quantity);
  *     return `Added ${quantity}x ${productId} to cart`;
  *   },
@@ -109,22 +124,21 @@ export interface Tool<TSchema extends z.ZodTypeAny> {
 export function defineTool<TSchema extends z.ZodTypeAny>(
   definition: ToolDefinition<TSchema>
 ): Tool<TSchema> {
-  const { name, description, inputSchema: zodSchema, execute, annotations } = definition;
+  const {
+    name,
+    title,
+    description,
+    inputSchema: zodSchema,
+    execute,
+    annotations,
+  } = definition;
 
-  // Convert Zod schema to JSON Schema at definition time
   const jsonSchema = zodToJsonSchema(zodSchema);
 
-  /**
-   * Wrap the execute callback to:
-   * 1. Validate input against the Zod schema
-   * 2. Auto-wrap string/object returns into ToolResponse format
-   * 3. Catch errors and return error responses
-   */
   const wrappedExecute = async (
     input: unknown,
-    agent: WebMCPAgent
+    client: ModelContextClient
   ): Promise<ToolResponse> => {
-    // Validate input using Zod
     const parseResult = zodSchema.safeParse(input);
 
     if (!parseResult.success) {
@@ -137,7 +151,7 @@ export function defineTool<TSchema extends z.ZodTypeAny>(
     }
 
     try {
-      const result = await execute(parseResult.data, agent);
+      const result = await execute(parseResult.data, client);
       return wrapResponse(result);
     } catch (error) {
       const message =
@@ -146,33 +160,53 @@ export function defineTool<TSchema extends z.ZodTypeAny>(
     }
   };
 
-  /**
-   * Build the raw WebMCP tool shape
-   */
   const toWebMCPTool = (): WebMCPTool => ({
     name,
+    ...(title !== undefined && { title }),
     description,
     inputSchema: jsonSchema,
     execute: wrappedExecute,
     ...(annotations && { annotations }),
   });
 
-  return {
+  // Per-tool AbortController, recreated on every successful register().
+  let controller: AbortController | null = null;
+
+  const tool: Tool<TSchema> = {
     name,
+    title,
     description,
     schema: zodSchema,
     inputSchema: jsonSchema,
     annotations,
 
     register() {
+      if (controller) {
+        // Already registered — idempotent.
+        return;
+      }
+
+      const localController = new AbortController();
+      controller = localController;
+
+      localController.signal.addEventListener(
+        'abort',
+        () => {
+          if (controller === localController) {
+            controller = null;
+          }
+          untrackRegistration(tool);
+        },
+        { once: true }
+      );
+
       const webmcpTool = toWebMCPTool();
+      const options = { signal: localController.signal };
 
       if (isWebMCPSupported()) {
-        // Use native API (dev panel will use modelContextTesting)
-        navigator.modelContext!.registerTool(webmcpTool);
+        navigator.modelContext!.registerTool(webmcpTool, options);
       } else {
-        // Use mock (dev panel will use internal registry)
-        getMockModelContext().registerTool(webmcpTool);
+        getMockModelContext().registerTool(webmcpTool, options);
         if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
           console.debug(
             `[webmcp-kit] Using mock modelContext for tool "${name}". ` +
@@ -180,22 +214,21 @@ export function defineTool<TSchema extends z.ZodTypeAny>(
           );
         }
       }
+
+      trackRegistration(tool);
     },
 
     unregister() {
-      if (isWebMCPSupported()) {
-        navigator.modelContext!.unregisterTool(name);
-      } else {
-        getMockModelContext().unregisterTool(name);
-      }
+      controller?.abort();
     },
 
-    async execute(input, agent) {
-      // Create default mock agent if not provided
-      const effectiveAgent = agent ?? createMockAgent();
-      return wrappedExecute(input, effectiveAgent);
+    async execute(input, client) {
+      const effectiveClient = client ?? createMockClient();
+      return wrappedExecute(input, effectiveClient);
     },
 
     toWebMCPTool,
   };
+
+  return tool;
 }

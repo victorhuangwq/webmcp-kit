@@ -9,9 +9,11 @@ Type-safe WebMCP tools with Zod.
 
 ## What is WebMCP?
 
-[WebMCP](https://github.com/webmachinelearning/webmcp) is a browser API that lets websites expose tools to AI agent, developed under the WebML working group.
+[WebMCP](https://webmachinelearning.github.io/webmcp/) is a browser API that lets websites expose tools to AI agents, developed under the WebML working group.
 
 The API adds `navigator.modelContext`, which websites use to register tools that agents can discover and call. Think of it like making your site's functionality available to AI assistants.
+
+The current spec exposes a single method — `navigator.modelContext.registerTool(tool, { signal })` — and tools are unregistered by aborting the `AbortSignal` you passed at registration time. webmcp-kit handles that controller lifecycle for you.
 
 Major browsers are starting to experiment with implementations.
 - Chrome:
@@ -111,8 +113,8 @@ const checkout = defineTool({
   name: 'checkout',
   description: 'Complete purchase',
   inputSchema: z.object({ cartId: z.string() }),
-  execute: async ({ cartId }, agent) => {
-    const { confirmed } = await agent.requestUserInteraction({
+  execute: async ({ cartId }, client) => {
+    const { confirmed } = await client.requestUserInteraction({
       prompt: 'Confirm purchase?',
       type: 'confirmation',
     });
@@ -155,15 +157,33 @@ This injects a panel that lists your tools, generates input forms from schemas, 
 ```typescript
 const tool = defineTool({
   name: string,
+  title?: string,
   description: string,
   inputSchema: ZodSchema,
-  execute: (input, agent) => Promise<string | ToolResponse>,
-  annotations?: ToolAnnotations,
+  execute: (input, client) => Promise<string | ToolResponse>,
+  annotations?: ToolAnnotations, // { readOnlyHint?, untrustedContentHint? }
 });
 
-tool.register();   // Add to navigator.modelContext
-tool.unregister(); // Remove from navigator.modelContext
+tool.register();   // Add to navigator.modelContext (mints an AbortController internally)
+tool.unregister(); // Aborts the signal — removes the tool
 tool.execute(input); // Call directly (for testing)
+```
+
+Internally, `tool.register()` calls `navigator.modelContext.registerTool(tool, { signal })` with a kit-owned `AbortController`. `tool.unregister()` aborts it. You don't need to manage controllers yourself.
+
+### `unregisterAll()` / `getRegisteredTools()`
+
+The kit tracks every tool you register via `defineTool().register()` in a process-wide set. This is handy for HMR, SPA route teardown, and test cleanup:
+
+```typescript
+import { unregisterAll, getRegisteredTools } from 'webmcp-kit';
+
+// e.g. on Vite HMR dispose
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => unregisterAll());
+}
+
+console.log(getRegisteredTools().map((t) => t.name));
 ```
 
 ### `enableDevMode()`

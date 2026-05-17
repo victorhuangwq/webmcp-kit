@@ -1,6 +1,6 @@
 import type { WebMCPTool, ToolResponse, JSONSchema } from '../types/index.js';
 import { toolRegistry } from '../mock/tool-registry.js';
-import { createMockAgent } from '../mock/agent.js';
+import { createMockClient } from '../mock/client.js';
 import { isWebMCPTestingSupported } from '../utils/feature-detect.js';
 
 interface PanelState {
@@ -61,8 +61,8 @@ async function executeTool(
     // Native API expects inputArgs as JSON string
     return navigator.modelContextTesting.executeTool(tool.name, JSON.stringify(input));
   }
-  const agent = createMockAgent();
-  return tool.execute(input, agent);
+  const client = createMockClient();
+  return tool.execute(input, client);
 }
 
 /**
